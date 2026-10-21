@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WorkFlowOS — AI OS-Level Workflow Discovery & Automation</title>
+    <meta name="description" content="AI-Powered OS-Level Workflow Automation: Observe, Understand, Detect Repetition, Generate Workflow, Approve, Automate, and Learn." />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/static/assets/style.css" />
+</head>
+<body>
+    <header>
+        <div class="logo-area">
+            <div class="logo-icon">⚡</div>
+            <div>
+                <div class="logo-text">WorkFlowOS</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 500;">AI OS-Level Workflow Automation</div>
+            </div>
+        </div>
+        <div class="header-status-area">
+            <div id="system-health-badge" class="badge badge-observing">
+                <div class="pulse-dot"></div>
+                <span id="system-health-text">SYSTEM ONLINE</span>
+            </div>
+            <div id="agent-status-badge" class="badge badge-paused">
+                <span id="agent-status-text">PAUSED</span>
+            </div>
+            <button id="btn-toggle-agent" class="btn btn-sm btn-success" onclick="toggleAgent()">
+                ▶ Start Observation
+            </button>
+            <button class="btn btn-sm" onclick="resetAllData()" style="border-color: rgba(239,68,68,0.4); color: #f87171;">
+                🗑 Reset Data
+            </button>
+        </div>
+    </header>
+
+    <!-- Top Dashboard Metrics Row -->
+    <section class="metrics-bar">
+        <div class="metric-card">
+            <div class="metric-value" id="m-events">0</div>
+            <div class="metric-label">Events Observed</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value" id="m-patterns">0</div>
+            <div class="metric-label">Repetitive Patterns</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value" id="m-workflows">0</div>
+            <div class="metric-label">Discovered Workflows</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value" id="m-pending">0</div>
+            <div class="metric-label">Pending Approval</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value" id="m-executions">0</div>
+            <div class="metric-label">Executions</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value" id="m-success" style="color: #4ade80;">0</div>
+            <div class="metric-label">Successful Runs</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value" id="m-timesaved" style="color: var(--accent-blue);">0 m</div>
+            <div class="metric-label">Time Saved</div>
+        </div>
+    </section>
+
+    <!-- System Integrations Status Section -->
+    <section class="integrations-container">
+        <div class="glass-panel" style="padding: 1rem 1.25rem;">
+            <div class="panel-header" style="margin-bottom: 0.75rem; padding-bottom: 0.5rem;">
+                <span class="panel-title">🔌 System Integration Status & Adapters</span>
+                <div class="btn-group">
+                    <button class="btn btn-sm" onclick="testGmailIntegration()">📧 Test Real Gmail API</button>
+                    <button class="btn btn-sm" onclick="testSlackIntegration()">💬 Test Slack Webhook</button>
+                    <button class="btn btn-sm btn-success" onclick="openAddCustomerModal()">➕ Add Customer</button>
+                    <button class="btn btn-sm" onclick="promptTestFindCustomer()">🔍 Test FIND_CUSTOMER</button>
+                    <button class="btn btn-sm" onclick="viewCRMCustomers()">👥 View CRM Customers</button>
+                    <button class="btn btn-sm" onclick="seedCRMCustomer()">👤 Seed Test Customer</button>
+                </div>
+            </div>
+            <div class="integration-grid">
+                <div class="integration-card" id="integ-gmail">
+                    <div class="integ-name">Gmail Integration</div>
+                    <div class="integ-mode" id="integ-gmail-mode">Checking...</div>
+                    <div class="integ-desc" id="integ-gmail-desc">Gmail API / OAuth 2.0</div>
+                </div>
+                <div class="integration-card" id="integ-crm">
+                    <div class="integ-name">Local CRM Database</div>
+                    <div class="integ-mode" id="integ-crm-mode">REAL_DATABASE</div>
+                    <div class="integ-desc" id="integ-crm-desc">SQLite Store (app.db)</div>
+                </div>
+                <div class="integration-card" id="integ-slack">
+                    <div class="integ-name">Slack Notifications</div>
+                    <div class="integ-mode" id="integ-slack-mode">Checking...</div>
+                    <div class="integ-desc" id="integ-slack-desc">Webhook / Local Fallback</div>
+                </div>
+                <div class="integration-card" id="integ-ai">
+                    <div class="integ-name">AI Engine</div>
+                    <div class="integ-mode" id="integ-ai-mode">Checking...</div>
+                    <div class="integ-desc" id="integ-ai-desc">Semantic Intent & Generator</div>
+                </div>
+                <div class="integration-card" id="integ-browser">
+                    <div class="integ-name">Browser Automation</div>
+                    <div class="integ-mode" id="integ-browser-mode">PLAYWRIGHT_READY</div>
+                    <div class="integ-desc" id="integ-browser-desc">Chromium UI Fallback</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main>
+        <!-- Left Column: Activity Observer & Event Telemetry -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Observation Control Panel -->
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <span class="panel-title">👁 Desktop Activity Observer</span>
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.4;">
+                    Captures multi-application activity streams across Windows desktop, Gmail, files, local CRM, and Slack.
+                </div>
+                <div class="btn-group" style="margin-bottom: 0.75rem; flex-wrap: wrap;">
+                    <button class="btn btn-sm btn-primary" onclick="generateRepeatedActivityPattern()" id="btn-generate-pattern" title="Records 3 sessions of genuine activity events without creating workflows">
+                        🔄 Generate Repeated Activity Pattern
+                    </button>
+                    <button class="btn btn-sm btn-success" onclick="triggerRepetitionDetection()" id="btn-scan-repetitions" title="Analyzes activity history, calculates similarity, and discovers workflow">
+                        🔍 Scan for Repetitions
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="resetAllData()" id="btn-reset-data" title="Clears events, workflows, and executions to initial clean state">
+                        🗑 Reset State
+                    </button>
+                </div>
+                <div style="background: rgba(0,0,0,0.3); padding: 0.6rem; border-radius: 6px; font-size: 0.75rem;">
+                    <div style="color: var(--text-muted); margin-bottom: 0.2rem;">WATCHED DIRECTORIES:</div>
+                    <code id="monitored-paths-text" style="color: var(--accent-blue);">C:\WorkFlowOS_Test\Input, C:\WorkFlowOS_Test\Output</code>
+                </div>
+            </div>
+
+            <!-- Live Events Telemetry Stream -->
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <span class="panel-title">📡 Live Activity Telemetry (<span id="events-count">0</span>)</span>
+                    <button class="btn btn-sm" onclick="loadEvents()">↻ Refresh</button>
+                </div>
+                <div id="events-list-container" class="event-list">
+                    <!-- Dynamic Events -->
+                </div>
+            </div>
+
+            <!-- Learning & Feedback Stats -->
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <span class="panel-title">🧠 Feedback & Reliability Stats</span>
+                </div>
+                <div id="learning-stats-content">
+                    <!-- Dynamic Learning Stats -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Discovered Workflows, Approval & Real Execution -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Discovered Workflow Candidates & AI Intent -->
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <span class="panel-title">⚡ Discovered Workflow Candidates (<span id="workflows-count">0</span>)</span>
+                    <button class="btn btn-sm btn-primary" onclick="triggerDiscovery()">🔍 Scan for Repetitive Patterns</button>
+                </div>
+                <div id="workflows-container" class="workflow-grid">
+                    <!-- Dynamic Workflow Cards -->
+                </div>
+            </div>
+
+            <!-- Real Automation Execution Engine Terminal -->
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <span class="panel-title">⚙️ Real Automation Execution Engine</span>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                    Step-by-step real execution with authentic adapter connectors (Gmail API / Local CRM DB / Slack API / Playwright Browser / Filesystem).
+                </div>
+                <div id="execution-terminal" class="terminal-box">
+[READY] WorkFlowOS Automation Engine online.
+Select an approved workflow candidate and click "Execute Real Workflow" to run real adapter operations.
+                </div>
+            </div>
+
+            <!-- Execution History -->
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <span class="panel-title">📜 Execution History</span>
+                </div>
+                <div id="executions-history-list">
+                    <!-- Dynamic Execution History -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Customer Modal -->
+    <div id="add-customer-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 999; align-items: center; justify-content: center;">
+        <div class="glass-panel" style="width: 100%; max-width: 480px; padding: 1.5rem; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border-highlight); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <div class="panel-header" style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                <span class="panel-title">➕ Add CRM Customer to Local DB</span>
+                <button class="btn btn-sm btn-danger" onclick="closeAddCustomerModal()">✕</button>
+            </div>
+            <form id="add-customer-form" onsubmit="submitAddCustomer(event)" style="display: flex; flex-direction: column; gap: 0.9rem;">
+                <div>
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Full Name *</label>
+                    <input type="text" id="cust-name-input" required placeholder="e.g. Sanvi S" style="width: 100%; padding: 0.6rem; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 0.85rem;" />
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Email Address *</label>
+                    <input type="email" id="cust-email-input" required placeholder="e.g. sas23aiml@cmrit.ac.in" style="width: 100%; padding: 0.6rem; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 0.85rem;" />
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Company / Organization</label>
+                    <input type="text" id="cust-company-input" placeholder="e.g. CMR Institute of Technology" style="width: 100%; padding: 0.6rem; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 0.85rem;" />
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Customer Status</label>
+                    <select id="cust-status-input" style="width: 100%; padding: 0.6rem; background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 0.85rem;">
+                        <option value="ACTIVE" selected>ACTIVE</option>
+                        <option value="NEW">NEW</option>
+                        <option value="VIP">VIP</option>
+                        <option value="PENDING">PENDING</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.5rem;">
+                    <button type="button" class="btn btn-sm" onclick="closeAddCustomerModal()">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-primary">💾 Save Customer to Local SQLite DB</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Unified Client Engine Script -->
+    <script src="/static/assets/app.js"></script>
+</body>
+</html>

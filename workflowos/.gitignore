@@ -1,0 +1,19 @@
+
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+# Google OAuth secrets
+**/credentials.json
+**/token.json
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+gmail_token.json
+token.json
+credentials.json
