@@ -1,4 +1,4 @@
-# setup_gmail_oauth.py
+# workflowos/setup_gmail_oauth.py
 """Interactive Gmail OAuth 2.0 Setup Script for WorkFlowOS.
 
 Features:
@@ -190,6 +190,7 @@ class OAuthCallbackHandler(http.server.BaseHTTPRequestHandler):
     """Robust OAuth callback handler that handles preflight probes and the final redirect."""
 
     def log_message(self, format, *args):
+        # Silent or subdued logging for clean CLI output
         pass
 
     def do_GET(self):

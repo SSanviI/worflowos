@@ -17,3 +17,13 @@ __pycache__/
 gmail_token.json
 token.json
 credentials.json
+app.db
+
+!.env.example
+credentials.json
+token.json
+gmail_token.json
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
